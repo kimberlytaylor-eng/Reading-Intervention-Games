@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prefix Power Challenge</title>
+<style>
+:root{--blue:#1769aa;--navy:#16324f;--light:#eef6fb;--green:#2e7d32;--red:#b3261e;--border:#c8d6e2}
+*{box-sizing:border-box} body{font-family:Arial,sans-serif;margin:0;background:#f7fafc;color:#17212b}
+.wrap{max-width:850px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+h1{margin:0;color:var(--navy)} .sub{color:#536575;margin-top:5px}.pill{background:white;border:1px solid var(--border);border-radius:999px;padding:10px 14px}
+.progress{height:10px;background:#dbe5ec;border-radius:99px;overflow:hidden;margin:20px 0}.bar{height:100%;background:var(--blue);width:4%}
+.card{background:white;border:1px solid var(--border);border-radius:18px;padding:25px;box-shadow:0 3px 12px #00000010}
+.level{text-transform:uppercase;font-size:12px;font-weight:bold;color:#647789;letter-spacing:.07em}
+.prompt{font-size:22px;font-weight:bold;margin:12px 0 20px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font-size:17px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--light);cursor:pointer;text-align:left}
+button:hover{border-color:var(--blue)}button:disabled{cursor:default}.correct{outline:3px solid var(--green)}.wrong{opacity:.55}
+.feedback{margin-top:18px;padding:15px;border-radius:12px;background:#f1f5f8;min-height:52px}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:16px}.actions button{background:white}.actions .next{background:var(--blue);color:white;font-weight:bold;text-align:center}
+.rule{background:#eaf4fb;border-radius:14px;padding:16px;margin-top:18px}.finish{text-align:center}.big{font-size:38px}
+@media(max-width:600px){.choices{grid-template-columns:1fr}.wrap{padding:14px}.prompt{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div><h1>Prefix Power Challenge</h1><div class="sub">Find it • Know it • Build it • Use it</div></div>
+<div><span class="pill">⭐ Score: <b id="score">0</b></span> <span class="pill"><b id="num">1</b>/25</span></div></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div class="card" id="card">
+<div class="level" id="level"></div><div class="prompt" id="prompt"></div><div class="choices" id="choices"></div>
+<div class="feedback" id="feedback">Choose an answer. <b>Your prefix poster is allowed!</b></div>
+<div class="actions"><button id="hint">💡 Hint</button><button class="next" id="next" disabled>Next →</button></div>
+</div>
+<div class="rule"><b>PREFIX POWER RULE</b><br>A <b>prefix</b> is added to the <b>beginning</b> of a base word and changes its meaning. When a big word feels intimidating, look at the beginning first.</div>
+</div>
+<script>
+const Q=[
+["LEVEL 1 · SPOT IT","Which part of <b>rebuild</b> is the prefix?",["re-","build","reb-","-ild"],0,"<b>re-</b> means again or back. Rebuild = build again.","Prefixes come at the beginning."],
+["LEVEL 1 · SPOT IT","Which part of <b>unhappy</b> is the prefix?",["happy","un-","-py","unh-"],1,"<b>un-</b> means not or the opposite of.","Look at the beginning of happy."],
+["LEVEL 1 · SPOT IT","Find the prefix in <b>preview</b>.",["view","pre-","prev-","-view"],1,"<b>pre-</b> means before.","A preview lets you see something before."],
+["LEVEL 1 · SPOT IT","Find the prefix in <b>misread</b>.",["read","mis-","mi-","-read"],1,"<b>mis-</b> means wrongly or badly.","Think: read something the wrong way."],
+["LEVEL 1 · SPOT IT","Find the prefix in <b>disagree</b>.",["agree","dis-","di-","-agree"],1,"<b>dis-</b> can mean not, opposite, or apart.","What was added before agree?"],
+["LEVEL 2 · KNOW IT","What does <b>re-</b> usually mean?",["before","again or back","under","not"],1,"<b>re- = again/back.</b> Reheat means heat again.","Think of redo."],
+["LEVEL 2 · KNOW IT","What does <b>pre-</b> usually mean?",["before","wrongly","too much","below"],0,"<b>pre- = before.</b> Preheat means heat beforehand.","Think of preschool."],
+["LEVEL 2 · KNOW IT","What does <b>un-</b> often mean?",["again","under","not/opposite","above"],2,"<b>un- = not/opposite.</b> Unsafe means not safe.","Think of unhappy."],
+["LEVEL 2 · KNOW IT","What does <b>mis-</b> usually mean?",["wrongly or badly","again","before","under"],0,"<b>mis- = wrongly/badly.</b> Miscalculate means calculate incorrectly.","Think of mistake."],
+["LEVEL 2 · KNOW IT","What does <b>over-</b> often mean?",["below","too much or above","not","again"],1,"<b>over-</b> can mean too much or above. Overheat = heat too much.","Think of overflowing."],
+["LEVEL 2 · KNOW IT","What does <b>under-</b> often mean?",["below or not enough","before","again","wrongly"],0,"<b>under-</b> can mean below or not enough.","Think of underground."],
+["LEVEL 2 · KNOW IT","What does <b>sub-</b> usually mean?",["above","under/below","again","not"],1,"<b>sub- = under/below.</b> A submarine travels under water.","Think of submarine."],
+["LEVEL 2 · KNOW IT","What does <b>non-</b> usually mean?",["not","again","too much","before"],0,"<b>non- = not.</b> Nonfiction means not fiction.","Think of nonfiction."],
+["LEVEL 2 · KNOW IT","What can <b>in-/im-</b> mean in words like incorrect and impossible?",["again","not","above","before"],1,"<b>in-/im-</b> can mean not. Incorrect = not correct; impossible = not possible.","Impossible = ___ possible."],
+["LEVEL 3 · BUILD IT","Which word means <b>heat again</b>?",["preheat","reheat","overheat","unheat"],1,"<b>re + heat = reheat.</b>","Which prefix means again?"],
+["LEVEL 3 · BUILD IT","Which word means <b>heat beforehand</b>?",["reheat","underheat","preheat","misheat"],2,"<b>pre + heat = preheat.</b>","Which prefix means before?"],
+["LEVEL 3 · BUILD IT","Which word means <b>calculate incorrectly</b>?",["recalculate","miscalculate","precalculate","noncalculate"],1,"<b>mis + calculate = miscalculate.</b>","Which prefix means wrongly?"],
+["LEVEL 3 · BUILD IT","Which word means <b>not safe</b>?",["resafe","presafe","unsafe","oversafe"],2,"<b>un + safe = unsafe.</b>","Which prefix can mean not?"],
+["LEVEL 3 · BUILD IT","Which word means <b>not developed enough</b>?",["overdeveloped","underdeveloped","redeveloped","predeveloped"],1,"<b>under + developed = underdeveloped.</b>","Which prefix can mean not enough?"],
+["LEVEL 3 · BUILD IT","Which word means <b>below the surface</b>?",["subsurface","oversurface","resurface","nonsurface"],0,"<b>sub + surface = subsurface.</b>","Which prefix means below?"],
+["LEVEL 4 · USE THE CLUE","The directions say: “Do not <b>overfill</b> the container.” What does overfill mean?",["fill again","fill before use","fill too much","not fill"],2,"Right. <b>over-</b> tells you the container can be filled too much.","Use the prefix meaning."],
+["LEVEL 4 · USE THE CLUE","A student needs to <b>rewrite</b> a paragraph. What should the student do?",["write it again","write it badly","write it beforehand","not write it"],0,"Exactly. <b>re-</b> tells us to write again.","What does re- mean?"],
+["LEVEL 4 · USE THE CLUE","A machine is <b>inoperable</b>. What clue does <b>in-</b> give you?",["It operates again","It is not operable","It operates too much","It operates below something"],1,"Correct. Here <b>in-</b> means not.","In this word, in- has a negative meaning."],
+["BOSS ROUND · CAREER WORD","An HVAC manual warns that a system may <b>overheat</b>. What does the prefix tell you?",["The system is heating again","The system may become too hot","The system was heated beforehand","The system is not heating"],1,"Exactly. You used <b>over-</b> to unlock part of the meaning.","Over- can mean too much."],
+["BOSS ROUND · BIG WORD","You see <b>miscommunication</b>. What is the smartest FIRST move?",["Guess the whole word","Skip it","Recognize mis- and use its meaning as a clue","Sound out every letter separately"],2,"YES! Spot <b>mis-</b> first. You just made a big word smaller.","Find what you know first!"]
+];
+let i=0,score=0,answered=false;
+const el=id=>document.getElementById(id);
+function draw(){
+ answered=false; let q=Q[i]; el("num").textContent=i+1; el("bar").style.width=((i+1)/Q.length*100)+"%";
+ el("level").textContent=q[0]; el("prompt").innerHTML=q[1]; el("feedback").innerHTML='Choose an answer. <b>Your prefix poster is allowed!</b>';
+ el("next").disabled=true; let c=el("choices"); c.innerHTML="";
+ q[2].forEach((v,n)=>{let b=document.createElement("button");b.innerHTML=v;b.onclick=()=>answer(n,b);c.appendChild(b)});
+}
+function answer(n,b){
+ if(answered)return;answered=true;let q=Q[i];[...el("choices").children].forEach(x=>x.disabled=true);
+ if(n===q[3]){score++;el("score").textContent=score;b.classList.add("correct");el("feedback").innerHTML="✓ "+q[4]}
+ else{b.classList.add("wrong");el("choices").children[q[3]].classList.add("correct");el("feedback").innerHTML="Not quite — "+q[4]}
+ el("next").disabled=false;
+}
+el("hint").onclick=()=>{if(!answered)el("feedback").innerHTML="<b>Hint:</b> "+Q[i][5]};
+el("next").onclick=()=>{if(i<Q.length-1){i++;draw()}else finish()};
+function finish(){
+ let pct=Math.round(score/Q.length*100);
+ el("card").innerHTML='<div class="finish"><div class="big">🏆</div><h2>Prefix Power Complete!</h2><p style="font-size:22px"><b>'+score+' / '+Q.length+'</b> · '+pct+'%</p><p>Every time you recognize a prefix, you have already unlocked part of a word.</p><div class="rule"><b>Your Big-Word Rule:</b><br>When a word looks difficult, don’t guess. <b>Look at the beginning and find what you know.</b></div><p><button onclick="location.reload()" style="margin-top:16px;background:#1769aa;color:white;text-align:center">Play Again</button></p></div>';
+}
+draw();
+</script>
+</body></html>
